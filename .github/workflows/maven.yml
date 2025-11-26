@@ -35,14 +35,38 @@ jobs:
     - name: Build with Maven
       run: mvn -B package --file pom.xml
 
+#    - name: Upload build artifact
+#      uses: actions/upload-artifact@v4
+#      with:
+#        name: plugin-jar
+#        # Upload only the main finalName jar
+#        #path: target/!(*original*|*shaded*|*sources*|*javadoc*).jar
+#        path: target/*.jar
+#        if-no-files-found: error
+
+    - name: Select main jar
+      run: |
+        echo "Available jars in target/:"
+        ls target || echo "No target directory"
+
+        # pick first jar that is NOT original-, -sources, -javadoc, -tests
+        MAIN_JAR=$(ls target/*.jar | grep -v 'original-' | grep -v 'sources' | grep -v 'javadoc' | grep -v 'tests' | head -n 1 || true)
+
+        if [ -z "$MAIN_JAR" ]; then
+          echo "No suitable main JAR found."
+          exit 1
+        fi
+
+        echo "Selected main JAR: $MAIN_JAR"
+        echo "MAIN_JAR=$MAIN_JAR" >> $GITHUB_ENV
+
     - name: Upload build artifact
       uses: actions/upload-artifact@v4
       with:
         name: plugin-jar
-        # Upload only the main finalName jar
-        #path: target/!(*original*|*shaded*|*sources*|*javadoc*).jar
-        path: target/*.jar
+        path: ${{ env.MAIN_JAR }}
         if-no-files-found: error
+
 
   publish:
     needs: build
