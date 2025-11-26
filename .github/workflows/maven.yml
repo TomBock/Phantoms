@@ -28,3 +28,11 @@ jobs:
         cache: maven
     - name: Build with Maven
       run: mvn -B package --file pom.xml
+
+    - name: Upload build artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: plugin-jar
+        # Upload only the main finalName jar
+        path: target/!(*original*|*shaded*|*sources*|*javadoc*).jar
+        if-no-files-found: error
