@@ -30,7 +30,8 @@ public final class PhoenixPhantoms extends JavaPlugin {
 
 		getServer().getPluginManager().registerEvents(new PhantomSpawnListener(), this);
 
-		new PhantomPlaceholderExpansion().register();
+		if(getServer().getPluginManager().getPlugin("PlaceholderAPI") != null)
+			new PhantomPlaceholderExpansion().register();
 
 		if(!economy.setup()) {
 			getServer().getPluginManager().disablePlugin(this);

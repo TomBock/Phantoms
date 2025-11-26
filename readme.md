@@ -1,78 +1,89 @@
 # Phoenix Phantoms
-Stärkere Phantome die nach längerer Zeit ohne Schlaf spawnen.
-- Wann spawnen sie? Nach 9 Minecraft-Tagen
-- Jeden weiteren Tag werden sie stärker
-- Command um Wachtimer hochzusetzen
-
-### Commands
-- `/awake <days>` - Stellt die Anzahl der Tage ohne Schlaf ein für einen selber
-- `/phantom <item> <player>` - Versucht einem Spieler ein Shopitem zu verkaufen (als NPC ausführen). Die Items kommen aus der shop.yml
-- `/phantom resetlimit` - Resettet die bisherig verkauften items (nicht Titel) für alle Spieler
-
-### Permissions
-- `phoenixphantoms.admin` - Berechtigung um den Command zu nutzen
+A Paper plugin that makes Phantoms progressively stronger the longer a player stays awake.
+The plugin introduces custom upgrades, configurable loot, a shop system, and placeholders for other plugins.
 
 
-### Placeholders
-- `%phoenixphantom_nachtfragment%` - 0/50
-- `%phoenixphantom_nachtkristall%` - 0/25
-- `%phoenixphantom_essenzdernacht%` - 0/10
-- `%phoenixphantom_nachtfragmenttitel%` - 0/1
-- `%phoenixphantom_nachtkristalltitel%` - 0/1
-- `%phoenixphantom_essenzdernachttitel%` - 0/1
-- `%phoenixphantom_awake%` - Anzahl Tage ohne Schlaf (zb. 3.14)
-- `%phoenixphantom_awake_{player}%` - Anzahl Tage ohne Schlaf für den ausführenden Spieler
+## Features
+- Phantoms get stronger the longer players stay awake, starting from a configurable day (e.g. day 9)
+- Fully configurable upgrades tiers (speed, health, damage, size, effects, loot)
+- Customizable loot system based on tiers
+- **Optional** shop commands to sell collected items for rewards
+- Placeholder support for displaying awake time and sold items
 
-### Configs
+## Requirements
+- PaperMC 1.20.x or 1.21.x
+- Java 21
+- [Vault](https://www.spigotmc.org/resources/vault.34315/)
+- [LuckPerms](https://www.spigotmc.org/resources/luckperms.28140/)
+- (Optional) [PlaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.6245/)
 
-- config.yml - Phantom Upgrades, Drops, Spawn
-- shop.yml - Shop limits, Preise & Belohnungen
-- sold_items.yml - Trackt verkaufte items pro Spieler
-- msg.yml - Spieler Nachrichten
+
+## Commands
+| Command                    | Description                                                                             |
+|----------------------------|-----------------------------------------------------------------------------------------|
+| `/awake <days>`            | Sets the number of days without sleep for yourself                                      |
+| `/phantom <item> <player>` | Attempts to sell a shop item to a player (execute as NPC). The items come from shop.yml |
+| `/phantom resetlimit`      | Resets the previously sold items (not titles) for all players                           |
+
+## Permissions
+| Permission                    | Description                             |
+|-------------------------------|-----------------------------------------|
+| `phoenixphantoms.admin`       | Grants access to all admin commands     |
+
+
+## Placeholders
+| Placeholder                       | Description                                                |
+|-----------------------------------|------------------------------------------------------------|
+| `%phoenixphantom_{item}%`         | Amount of items sold: `0/25`                               |
+| `%phoenixphantom_awake%`          | Amount of days without sleep: `3.14`                       |
+| `%phoenixphantom_awake_{player}%` | Amount of days without sleep for a specific player: `3.14` |
+
+## Configs
+
+- `config.yml` - Phantom upgrades, spawn rules & loot
+- `msg.yml` - Player facing messages
+- `shop.yml` - Shop items, limits, prices & rewards
+- `sold_items.yml` - Tracks sold items per player
 
 Config.yml
 ```yaml
-spawn_start: 9 # ab wieviel Minecraft-Tagen die Phantome anfangen zu spawnen
-debug: false # ob Debug-Nachrichten im Chat geschrieben werden sollen
+spawn_start: 9 # At how many sleepless minecraft days Phantoms start spawning
+debug: false # Whether debug messages should be printed to console
 placeholder:
   sold_items_color: "§6§l"
+
 upgrades:
-  1: # Ab 1 Tag drüber
-    # Alle Eigenschaften sind optional
-    name: "Kleines Phantom"
+  1: # Active after 1 day over the spawn_start
+    # All properties are optional
+    name: "Small Phantom"
     speed: 1
     health: 9
-  2: # Ab 2 Tagen drüber...
-  5: # Ab 5 Tagen drüber...
-    name: "Großes Phantom"
+  2: # After 2 days over...
+  5: # After 3 days over...
+    name: "Large Phantom"
     speed: 2
-    health: 20 #int
-    damage: 15 #int
+    health: 20
+    damage: 15
     knockback: 2
-    size: 3 #int
+    size: 3
     effects:
-      fire_resistance: 1 #Level des Effekts. Namen entsprechen den PotionEffectTypes
+      fire_resistance: 1 # Potion effect level
       #...
-    loot: # Alles an loot muss in der config definiert sein (bis auf default)
-      - default # Erlaubt das Standard Loot droppen kann
-      - diamond # 100% chance 2 diamonds zu kriegen; siehe unten
-      - debug_stick:0.1 # 10% chance einen debug stick zu kriegen
+    loot:
+      - default # Allows vanilla loot
+      - phantom_skin:0.1 # 10% chance to drop phantom_skin
 
-# Hier wird alles definiert was als Loot droppen kann, per namen verwendet man es
+# All loot types must be defined here (except 'default')
 loot:
-  debug_stick:
+  phantom_skin:
     ==: org.bukkit.inventory.ItemStack
     v: 4189
-    type: DEBUG_STICK
+    type: FEATHER
+    amount: 1
     meta:
       ==: ItemMeta
       meta-type: UNSPECIFIC
-      display-name: '{"text":"Debug Stick","bold":true,"color":"yellow"}'
+      display-name: '{"text":"Phantom Skin","color":"yellow"}'
       lore:
         - '{"text":"_","color":"gray"}'
-  diamond:
-    ==: org.bukkit.inventory.ItemStack
-    v: 4189
-    type: DIAMOND
-    amount: 2
 ```
