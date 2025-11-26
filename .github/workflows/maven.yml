@@ -34,5 +34,6 @@ jobs:
       with:
         name: plugin-jar
         # Upload only the main finalName jar
-        path: target/!(*original*|*shaded*|*sources*|*javadoc*).jar
+        #path: target/!(*original*|*shaded*|*sources*|*javadoc*).jar
+        path: target/*.jar
         if-no-files-found: error
